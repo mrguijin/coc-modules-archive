@@ -1,0 +1,34 @@
+# 构建产物
+dist/
+dist-ssr/
+
+# 依赖
+node_modules/
+
+# 运行期数据与日志（绝不入库：包含用户数据与审计日志）
+backend/data/
+backend/database.json
+*.log
+logs/
+
+# 本地测试产物
+tools/_shots/
+tools/_unmapped.txt
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.local
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# 本地运行目录（日志与 pid）
+.run/
+
+# 本地演示数据（tools/seed-demo.mjs 的默认落点之外的自定义目录）
+.demo-data/

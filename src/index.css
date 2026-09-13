@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/*
+ * 原生控件配色
+ * ---------------------------------------------------------------------------
+ * <select> 的下拉列表、<input type="date"> 的日历、<datalist> 的建议列表都是**浏览器原生渲染**的，
+ * Tailwind 类管不到它们，默认会弹出一块白底面板，和站点的暗黑风格割裂。
+ * 这里用 CSS 的 color-scheme 让浏览器统一按暗色渲染原生控件；能直接改样式的（option / autofill）
+ * 再额外覆盖一层，保证 Windows / macOS / Linux 上观感一致。
+ * 注意：<datalist> 的建议列表在 Chrome 里不吃 color-scheme，已全部改用自绘的 Combobox 组件。
+ */
+html {
+  color-scheme: dark;
+}
+
+input,
+select,
+textarea,
+button {
+  color-scheme: dark;
+}
+
+select option,
+select optgroup {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+select option:checked,
+select option:hover {
+  background-color: #1e293b;
+  color: #ffffff;
+}
+
+/* Chrome 自动填充会强制白底黑字，这里覆盖掉 */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #e2e8f0;
+  -webkit-box-shadow: 0 0 0 1000px #020617 inset;
+  box-shadow: 0 0 0 1000px #020617 inset;
+  transition: background-color 9999s ease-in-out 0s;
+  caret-color: #e2e8f0;
+}
+
+/* 日期/时间控件的图标在暗色下反色，否则几乎看不见 */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.75);
+  cursor: pointer;
+}
+
+/*
+ * 全局样式补充
+ * ---------------------------------------------------------------------------
+ * 1) 补齐历史遗留的动画工具类。
+ *    原工程使用了 `animate-in` / `fade-in` / `slide-in-from-bottom-4`，但从未安装
+ *    tailwindcss-animate，这些类在产物 CSS 中并不存在 —— 也就是说动画一直是「写了但没生效」。
+ *    这里用原生 CSS 直接实现同名工具类，不引入任何新依赖。
+ * 2) 打印样式：角色卡 A4 打印 / 另存为 PDF。
+ */
+
+@layer utilities {
+  @keyframes coc-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes coc-slide-up {
+    from { opacity: 0; transform: translate3d(0, 1rem, 0); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes coc-zoom-in {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .animate-in {
+    animation-duration: 260ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-fill-mode: both;
+  }
+  .fade-in { animation-name: coc-fade-in; }
+  .slide-in-from-bottom-4 { animation-name: coc-slide-up; }
+  .zoom-in-95 { animation-name: coc-zoom-in; }
+
+  /* 尊重系统的「减少动态效果」设置 */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-in { animation: none !important; }
+  }
+}
+
+/* ------------------------------------------------------------------ 打印 */
+@page {
+  size: A4 portrait;
+  margin: 8mm;
+}
+
+@media print {
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  /* 打印时只保留 .print-root 及其子元素 */
+  body * { visibility: hidden !important; }
+  .print-root, .print-root * { visibility: visible !important; }
+  .print-root {
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .no-print { display: none !important; }
+  .print-page {
+    page-break-after: always;
+    break-after: page;
+  }
+  .print-page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+  .print-avoid-break { break-inside: avoid; }
+}
+
+/* 屏幕上模拟 A4 纸张（打印预览用） */
+.print-paper {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 8mm;
+  background: #ffffff;
+  color: #111827;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
+}
+
+@media (max-width: 900px) {
+  .print-paper {
+    width: 100%;
+    min-height: auto;
+    padding: 4mm;
+  }
+}

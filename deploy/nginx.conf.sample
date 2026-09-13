@@ -1,0 +1,78 @@
+# ---------------------------------------------------------------------------
+# Nginx 站点配置样例（秘密调查档案馆）
+#
+# 要点：
+#   1) 静态前端与 /api 必须**同源**：前端全部使用相对路径 /api/... 调用接口，
+#      跨域会被浏览器拦截，后端也默认不开启 CORS。
+#   2) 后端只需监听 127.0.0.1:3000，不要直接对外暴露 3000 端口，
+#      否则攻击者可以绕过 Nginx 伪造 X-Forwarded-For 来绕过限流。
+#   3) 站点必须挂在域名根路径（Vite 产物引用 /assets/... 绝对路径）。
+#   4) 安全响应头在这一层下发；页面里还有一份同内容的 CSP meta 作为兜底。
+# ---------------------------------------------------------------------------
+
+server {
+    listen       80;
+    listen       [::]:80;
+    server_name  coc.example.com;
+
+    # 生产环境请务必启用 HTTPS（例如用 certbot 申请证书），并 301 跳转
+    # return 301 https://$host$request_uri;
+
+    root  /var/www/coc;   # ← 换成你的站点静态根
+    index index.html;
+
+    # 上传体积上限（后端自身限制为 256KB，这里给一点余量）
+    client_max_body_size 1m;
+
+    # --- 安全响应头 ------------------------------------------------------
+    add_header X-Content-Type-Options    "nosniff"            always;
+    add_header X-Frame-Options           "DENY"               always;
+    add_header Referrer-Policy           "no-referrer"        always;
+    add_header Permissions-Policy        "geolocation=(), microphone=(), camera=()" always;
+    add_header Content-Security-Policy   "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" always;
+    # 启用 HTTPS 后再打开这一行，并提交到预加载列表
+    # add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # --- 接口反向代理 ----------------------------------------------------
+    location /api/ {
+        proxy_pass         http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+    }
+
+    # --- 静态资源 --------------------------------------------------------
+    # Vite 产物文件名带内容哈希，可以放心长缓存
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # index.html 绝不缓存，否则发版后用户仍拿到旧页面
+    location = /index.html {
+        add_header Cache-Control "no-store, must-revalidate";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 隐藏文件与运行期数据目录一律拒绝
+    location ~ /\.(?!well-known) { deny all; }
+    location ~ ^/(backend|shared|tools)/ { deny all; }
+}
+
+# --- HTTPS 参考 -----------------------------------------------------------
+# server {
+#     listen 443 ssl http2;
+#     server_name coc.example.com;
+#     ssl_certificate     /etc/letsencrypt/live/coc.example.com/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/coc.example.com/privkey.pem;
+#     ssl_protocols       TLSv1.2 TLSv1.3;
+#     ssl_ciphers         HIGH:!aNULL:!MD5;
+#     # ……其余 location 与上面一致……
+# }

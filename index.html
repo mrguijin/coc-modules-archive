@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="description" content="秘密调查档案馆 —— COC 跑团模组收录、带团履历与半自动车卡" />
+    <!--
+      站点级内容安全策略（与 Nginx 上的同名响应头配合使用，取两者交集）：
+        default-src 'self'          只允许同源资源，杜绝第三方脚本/样式外链
+        style-src 'unsafe-inline'   站点使用 Tailwind 原子类 + 一处内联滚动条样式
+        img-src data: blob:         证书长图导出时使用 data:/blob: URL
+        connect-src 'self'          接口与前端同源
+      注意：
+        1) 不要把 cdnjs / jsdelivr 等第三方域名加回来 —— 截图库已改为本地依赖。
+        2) frame-ancestors 只能经响应头下发，写在 meta 里会被忽略，因此这里不含它；
+           如需禁止被 iframe 嵌套，请在 Nginx 上加 X-Frame-Options 或 CSP 响应头。
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'"
+    />
+    <title>coc模组列表</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

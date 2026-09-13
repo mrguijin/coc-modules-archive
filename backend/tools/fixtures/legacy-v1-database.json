@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "users": [
+    {
+      "id": "1000000000001",
+      "username": "legacy-keeper",
+      "password": "LegacyPass-1920",
+      "role": "admin",
+      "title": "首席守秘人",
+      "token": "legacy-plaintext-token-keeper"
+    },
+    {
+      "id": "1000000000002",
+      "username": "legacy-player",
+      "password": "LegacyPass-1920",
+      "role": "user",
+      "title": "见习调查员",
+      "token": "legacy-plaintext-token-player"
+    }
+  ],
+  "modules": [
+    {
+      "id": "2000000000001",
+      "title": "迁移测试模组·甲",
+      "series": "回归测试合集",
+      "region": "英国",
+      "era": "1920s",
+      "players": "3-4",
+      "duration": "3-4",
+      "description": "冒烟测试用的最小模组档案，只用于验证旧库迁移与接口行为。",
+      "charInfo": "无特殊要求。",
+      "occupations": "任意",
+      "skills": "侦查、图书馆使用",
+      "notes": "这是测试夹具，不是真实模组。",
+      "isPinned": false,
+      "themeColor": "from-emerald-900 to-slate-900",
+      "createdAt": 1600000000000,
+      "updatedAt": 1600000000000
+    },
+    {
+      "id": "2000000000002",
+      "title": "迁移测试模组·乙",
+      "series": "",
+      "region": "美国",
+      "era": "现代",
+      "players": "2-3",
+      "duration": "2-3",
+      "description": "冒烟测试用的第二个模组档案。",
+      "charInfo": "无特殊要求。",
+      "occupations": "任意",
+      "skills": "聆听",
+      "notes": "这是测试夹具，不是真实模组。",
+      "isPinned": false,
+      "themeColor": "from-amber-900 to-stone-900",
+      "createdAt": 1600000000001,
+      "updatedAt": 1600000000001
+    }
+  ],
+  "played_records": [
+    { "userId": "1000000000002", "moduleId": "2000000000001" }
+  ],
+  "sessions": []
+}
